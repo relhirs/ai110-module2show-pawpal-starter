@@ -6,6 +6,24 @@
 
 - Briefly describe your initial UML design.
 - What classes did you include, and what responsibilities did you assign to each?
+Brainstorm the main objects needed for the system. For each object, determine:
+What information it needs to hold (attributes)
+What actions it can perform (methods)
+
+data to store (attributes):
+- pet names
+- pet owners
+- tasks
+- time availability 
+
+actions to perform (methods):
+- assign task
+- enter pet and owner into system
+- edit tasks
+
+classes:
+task, pet, pet_owner and sceuduler 
+
 
 **b. Design changes**
 
