@@ -67,7 +67,13 @@ pytest --cov
 Sample test output:
 
 ```
-# Paste your pytest output here
+=== Alice's Schedule ===
+  [  scheduled] Walk Coco              (Coco, HIGH, 9:00 AM - 9:30 AM)
+  [  scheduled] Feed Dino              (Dino, HIGH, 10:00 AM - 10:15 AM)
+
+=== Bob's Schedule ===
+  [  scheduled] Clean Spiky's Tank     (Spiky, HIGH, 8:00 AM - 8:20 AM)
+
 ```
 
 ## 📐 Smarter Scheduling

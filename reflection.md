@@ -22,13 +22,30 @@ actions to perform (methods):
 - edit tasks
 
 classes:
-task, pet, pet_owner and sceuduler 
+task
+-able to edit tasks
+ 
+ pet
+- able to add a task to the pet
+
+ pet_owner
+ - able to add a pet 
+ - able to set availability 
+  
+  
+scheuduler 
+- able to assign a task
+- able to edit task
+- able to build a scheduel 
+
 
 
 **b. Design changes**
 
 - Did your design change during implementation?
 - If yes, describe at least one change and why you made it.
+
+the task class didnt have a owner/assignee link to it when claude initially made it, added that 
 
 ---
 
