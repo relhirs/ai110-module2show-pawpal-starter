@@ -136,7 +136,7 @@ class Scheduler:
                 recurring=task.recurring
             )
 
-        pet.add_task(next_task)
+            pet.add_task(next_task)
 
         return self.all_tasks()
     

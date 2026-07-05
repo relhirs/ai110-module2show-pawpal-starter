@@ -58,15 +58,32 @@ Paste a sample of your app's CLI or Streamlit output here so a reader can see wh
 
 ```bash
 # Run the full test suite:
-pytest
+```text
+(venv) ~/CodePath AI101/Project/Week 5 ➜ python -m pytest
+================================================================= test session starts ==================================================================
+platform darwin -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0
+rootdir: /Users/relhirsch/CodePath AI101/Project/Week 5
+plugins: anyio-4.14.1
+collected 5 items                                                                                                                                      
 
+tests/test_pawpal.py .....                                                                                                                       [100%]
+
+================================================================== 5 passed in 0.02s ===================================================================
+these test cover: Sorting Correctness: Verify tasks are returned in chronological order.
+
+
+Recurrence Logic: Confirm that marking a daily task complete creates a new task for the following day.
+
+
+Conflict Detection: Verify that the Scheduler flags duplicate times.
+```
 # Run with coverage:
 pytest --cov
 ```
 
 Sample test output:
 
-```
+```text
 === Alice's Schedule ===
   [  scheduled] Walk Coco              (Coco, HIGH, 9:00 AM - 9:30 AM)
   [  scheduled] Feed Dino              (Dino, HIGH, 10:00 AM - 10:15 AM)
@@ -82,10 +99,10 @@ Sample test output:
 
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Task sorting | sort_by_time | sorts tasks by start time |
+| Filtering | filter_by_pet_name | returns tasks that are associated with the specified pet name |
+| Conflict handling | assign_task | ensures that no task can override another with a same time conflict |
+| Recurring tasks | mark_complete | recreates the task for the specified recurring time after it's been completed |
 
 ## 📸 Demo Walkthrough
 
