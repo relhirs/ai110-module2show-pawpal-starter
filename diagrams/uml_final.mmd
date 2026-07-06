@@ -1,0 +1,71 @@
+classDiagram
+    %% Updated to match the final implementation in pawpal_system.py
+
+    class Priority {
+        <<enumeration>>
+        LOW
+        MEDIUM
+        HIGH
+    }
+
+    class Recurrence {
+        <<enumeration>>
+        DAILY
+        WEEKLY
+        MONTHLY
+        NO_REPEAT
+    }
+
+    class TimeSlot {
+        +int start_minute
+        +int end_minute
+        +duration_minutes() int
+    }
+
+    class Task {
+        +str title
+        +int duration_minutes
+        +Priority priority
+        +Pet pet
+        +TimeSlot slot
+        +Recurrence recurring
+        +edit(title: str, duration_minutes: int, priority: Priority) void
+    }
+
+    class PetOwner {
+        +str name
+        +List~TimeSlot~ availability
+        +List~Pet~ pets
+        +add_pet(pet: Pet) void
+        +set_availability(slots: List~TimeSlot~) void
+    }
+
+    class Pet {
+        +str name
+        +str species
+        +PetOwner owner
+        +List~Task~ tasks
+        +add_task(task: Task) void
+        +remove_task(task: Task) void
+    }
+
+    class Scheduler {
+        +PetOwner owner
+        +all_tasks() List~Task~
+        +assign_task(task: Task, pet: Pet) void
+        +edit_task(task: Task, changes: dict) void
+        +mark_complete(task: Task, pet: Pet) List~Task~
+        +sort_by_time() List~Task~
+        +filter_by_pet_name(pet: Pet) List~str~
+        +build_schedule() Dict~str, Task~
+    }
+
+    PetOwner "1" --> "*" Pet : owns
+    PetOwner "1" --> "*" TimeSlot : availability
+    Pet "1" --> "*" Task : has
+    Task "1" --> "0..1" TimeSlot : slot
+    Task "1" --> "1" Priority : priority
+    Task "1" --> "1" Recurrence : recurring
+    Scheduler "1" --> "1" PetOwner : owner
+    Scheduler ..> Task : assigns / edits / sorts / completes
+    Scheduler ..> TimeSlot : builds schedule from availability

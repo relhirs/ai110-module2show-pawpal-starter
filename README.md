@@ -12,6 +12,17 @@ A busy pet owner needs help staying consistent with pet care. They want an assis
 
 Your job is to design the system first (UML), then implement the logic in Python, then connect it to the Streamlit UI.
 
+## ✨ Features
+
+PawPal+'s scheduling engine (`pawpal_system.py`) implements the following behaviors:
+
+- **Priority-based greedy scheduling** (`build_schedule`) — fills the owner's declared availability by assigning the highest-priority pending tasks first, splitting any leftover slot time so it can be reused by the next task.
+- **Chronological sorting** (`sort_by_time`) — returns every one of an owner's tasks ordered by scheduled start time, with unscheduled tasks always pushed to the end of the list.
+- **Conflict warnings** (`assign_task`) — rejects a task assignment if its time slot exactly matches a slot already in use, preventing two tasks from double-booking the same time.
+- **Daily/weekly/monthly recurrence** (`mark_complete`) — completing a recurring task (`Recurrence.DAILY`, `WEEKLY`, or `MONTHLY`) removes it and automatically creates its next occurrence, with the time slot shifted forward by 24 hours, 7 days, or 30 days respectively.
+- **Pet-based filtering** (`filter_by_pet_name`) — retrieves just the tasks belonging to one specific pet, useful for per-pet views.
+- **In-place task editing** (`edit_task` / `Task.edit`) — updates a task's title, duration, or priority without disturbing its pet assignment or schedule slot.
+
 ## What you will build
 
 Your final app should:
@@ -104,14 +115,50 @@ Sample test output:
 | Conflict handling | assign_task | ensures that no task can override another with a same time conflict |
 | Recurring tasks | mark_complete | recreates the task for the specified recurring time after it's been completed |
 
-## 📸 Demo Walkthrough
+## 📖 Demo Walkthrough
 
-Describe your app in numbered steps so a reader can follow along without watching a video:
+### Main UI features
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+The Streamlit app (`app.py`) lets a user:
 
-**Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->
+- Enter an owner name, which creates a `PetOwner` and a `Scheduler` for the session.
+- Add one or more pets (name + species) via a form.
+- Schedule a task for a pet: title, duration, priority, and a start time. This builds a `TimeSlot` and calls `Scheduler.assign_task`.
+- View all of an owner's tasks in a table sorted chronologically by `Scheduler.sort_by_time`.
+- Click **Generate schedule** to run `Scheduler.build_schedule`, which greedily fills the owner's availability with pending tasks (highest priority first) and reports which tasks did or didn't fit.
+
+### Example workflow
+
+1. **Add a pet** — enter "Mochi" (dog) and submit. Mochi appears in the pets table with a task count of 0.
+2. **Schedule a task** — add "Morning walk", 20 minutes, high priority, for Mochi, starting at 08:00. `assign_task` succeeds, and the task appears in the "Current tasks" table at `08:00`.
+3. **Try to double-book** — add another task for Mochi also starting at 08:00. `assign_task` raises a `ValueError` because that `TimeSlot` is already taken; the UI catches it and shows a warning instead of crashing, and the duplicate is not added.
+4. **View today's schedule** — click **Generate schedule**. `build_schedule` assigns the owner's declared availability to pending tasks, priority first, and displays the result as a table, plus a success/warning message noting whether every task fit.
+
+### Key Scheduler behaviors shown
+
+- **Sorting** — the "Current tasks" table always reflects `sort_by_time`'s chronological order, so newly added tasks slot into the right position automatically.
+- **Conflict warnings** — attempting to assign a task to an already-used `TimeSlot` is blocked by `assign_task` and surfaced as a Streamlit warning rather than an unhandled error.
+- **Recurrence** — not wired into the UI yet, but exercised directly in `main.py` and `tests/test_pawpal.py`: completing a `Recurrence.DAILY` task via `mark_complete` removes it and creates a new task for the same time 24 hours later.
+
+### Sample CLI output (`python main.py`)
+
+`main.py` builds two owners with pets and tasks, then deliberately tries to assign a second task ("Feed Coco") to the exact same 9:00–9:30 AM slot already used by "Walk Coco" to exercise the conflict check. Since the script doesn't catch the exception the way `app.py` does, the conflict surfaces as an uncaught error:
+
+```text
+$ python main.py
+Traceback (most recent call last):
+  File "main.py", line 74, in <module>
+    scheduler1.assign_task(task=task4, pet=coco)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "pawpal_system.py", line 103, in assign_task
+    raise ValueError(f"{task.slot} already exists and cannot be overridden")
+ValueError: TimeSlot(start_minute=540, end_minute=570) already exists and cannot be overridden
+```
+
+If the conflicting `assign_task` call is skipped, `print_schedule` calls `build_schedule`, which greedily reassigns each task to Alice's declared availability (`time1`, `time2`, `time3`), and produces:
+
+```text
+=== Alice's Schedule ===
+[  scheduled] Walk Coco              (Coco, HIGH, 9:00 AM - 9:30 AM)
+[  scheduled] Feed Dino              (Dino, HIGH, 10:00 AM - 10:15 AM)
+```
